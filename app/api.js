@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 //const API_BASE_URL = 'https://localhost:7040/api';
-const API_BASE_URL = 'https://test-swagger-api-final.azurewebsites.net/api';
+const API_BASE_URL = 'https://webapi-shopping-interview.azurewebsites.net/api';
 
 // ฟังก์ชันสำหรับเรียกข้อมูลผู้ใช้
 export const fetchUsers = async () => {
