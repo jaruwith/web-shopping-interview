@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Container, Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button } from '@mui/material';
-import { fetchProducts, createOrder, updateProductStock } from '../../api'; 
+import { fetchProducts, createOrder, updateProductStock } from '../../api';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -53,7 +53,7 @@ export default function Home() {
   const handleAddToCart = (product) => {
     const quantity = quantities[product.productId] || 1;
 
-    if (quantity > product.stock) {
+    if (quantity > product.stock.quantity) {
       toast.error('Quantity exceeds stock!');
       return;
     }
@@ -71,18 +71,24 @@ export default function Home() {
     
     setQuantities({ ...quantities, [product.productId]: 1 });
 
-    product.stock = product.stock -quantity;
+    product.stock.quantity -= quantity;
   };
 
   const handleRemoveFromCart = (cartId) => {
+    const item = cartItems.find(item => item.cartId === cartId);
+    if (item) {
+        setProducts(products.map(p =>
+            p.productId === item.productId ? { ...p, stock: { ...p.stock, quantity: p.stock.quantity + item.quantity } } : p
+        ));
+    }
     setCartItems(cartItems.filter(item => item.cartId !== cartId));
   };
 
   const handleQuantityChange = (productId, quantity) => {
     const product = products.find(p => p.productId === productId);
-    if (quantity > product.stock) {
+    if (quantity > product.stock.quantity) {
       toast.error('Quantity exceeds stock!');
-      setQuantities({ ...quantities, [productId]: product.stock });
+      setQuantities({ ...quantities, [productId]: product.stock.quantity });
     } else {
       setQuantities({ ...quantities, [productId]: quantity });
     }
@@ -109,8 +115,11 @@ export default function Home() {
       console.log('Order created:', createdOrder);
       
       for (const item of cartItems) {
-        await updateProductStock(item.productId, item.stock - item.quantity);
-      }
+        const product = products.find(p => p.productId === item.productId);
+        if (product) {
+            await updateProductStock(item.productId, product.stock.quantity);
+        }
+    }
 
       const updatedProducts = await fetchProducts();
       setProducts(updatedProducts);
@@ -129,7 +138,7 @@ export default function Home() {
     <Container maxWidth="lg">
       <Box my={4}>
         <Typography variant="h4" component="h1" align="center" gutterBottom>
-          Product List
+          Product Data
         </Typography>
 
         {user && (
@@ -166,7 +175,7 @@ export default function Home() {
                   <TableCell align="center">{product.name}</TableCell>
                   <TableCell align="center">{product.description}</TableCell>
                   <TableCell align="center">{product.price}</TableCell>
-                  <TableCell align="center">{product.stock}</TableCell>
+                  <TableCell align="center">{product.stock.quantity}</TableCell>
                   <TableCell align="center">
                     <TextField
                       type="number"
@@ -183,9 +192,9 @@ export default function Home() {
                       variant="contained"
                       color="primary"
                       onClick={() => handleAddToCart(product)}
-                      disabled={product.stock === 0}
+                      disabled={product.stock.quantity === 0}
                     >
-                      {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                      {product.stock.quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -196,7 +205,7 @@ export default function Home() {
 
         {cartItems.length > 0 && (
           <Box my={4}>
-            <Typography variant="h5" align="center">Cart Items</Typography>
+            <Typography variant="h5" align="center">Shopping Cart</Typography>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -239,7 +248,7 @@ export default function Home() {
                 onClick={() => window.confirm('Are you sure you want to place the order?') && handleCheckout()}
                 style={{ marginTop: '10px' }}
               >
-                Confirm Order
+                Check out
               </Button>
             </Box>
           </Box>

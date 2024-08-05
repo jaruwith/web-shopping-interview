@@ -25,9 +25,12 @@ export const registerUser = async (userData) => {
   };
 
   // ฟังก์ชันสำหรับการเรียกข้อมูลผลิตภัณฑ์
-export const fetchProducts = async () => {
+  export const fetchProducts = async () => {
     try {
+
       const response = await axios.get(`${API_BASE_URL}/Products`);
+
+      console.log(response.data);
       return response.data;
     } catch (error) {
       throw new Error('Error fetching products: ' + error.message);
@@ -44,21 +47,21 @@ export const fetchProducts = async () => {
     }
   };
   
-  // ฟังก์ชันสำหรับการอัพเดทสต็อคสินค้า
-  export const updateProductStock = async (productId, stock) => {
-    try {
-      const formData = new FormData();
-      formData.append('Stock', stock);
-  
-      await axios.put(`${API_BASE_URL}/Products/${productId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-    } catch (error) {
-      throw new Error('Error updating product stock: ' + error.message);
-    }
-  };
+//ฟังก์ชันสำหรับการอัพเดทสต็อคสินค้า
+export const updateProductStock = async (productId, stock) => {
+  try {
+    const formData = new FormData();
+    formData.append('Stock', stock);
+
+    await axios.put(`${API_BASE_URL}/Products/${productId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  } catch (error) {
+    throw new Error('Error updating product stock: ' + error.message);
+  }
+};
 
 // ฟังก์ชันสำหรับการเรียกข้อมูลออเดอร์
 export const fetchOrders = async () => {
