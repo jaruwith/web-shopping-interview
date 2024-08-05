@@ -1,21 +1,16 @@
 
 import axios from 'axios';
 
-//const API_BASE_URL = 'https://localhost:7040/api';
-const API_BASE_URL = 'https://test-swagger-api-final.azurewebsites.net/api';
+const API_BASE_URL = 'https://localhost:7040/api';
+//const API_BASE_URL = 'https://test-swagger-api-final.azurewebsites.net/api';
 
-// ฟังก์ชันสำหรับ login
-export const fetchUser = async (username, passwordHash) => {
+// ฟังก์ชันสำหรับเรียกข้อมูลผู้ใช้
+export const fetchUsers = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/Users`, {
-      params: {
-        username: username,
-        passwordHash: passwordHash
-      }
-    });
+    const response = await axios.get(`${API_BASE_URL}/Users`);
     return response.data;
   } catch (error) {
-    throw new Error('Error fetching user: ' + error);
+    throw new Error('Error fetching users: ' + error);
   }
 };
 

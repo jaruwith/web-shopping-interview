@@ -7,7 +7,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { fetchUser } from '../api'; // Import fetchUser
+import { fetchUsers } from '../api'; 
 
 const theme = createTheme();
 
@@ -44,7 +44,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const user = await fetchUser(formData.username, formData.password);
+      const users = await fetchUsers(); 
+      const user = users.find(u => u.username === formData.username && u.passwordHash === formData.password);
       if (user) {       
         const { passwordHash, createdAt, ...userWithoutSensitiveInfo } = user;
 
